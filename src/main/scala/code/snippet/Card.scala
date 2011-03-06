@@ -16,24 +16,9 @@ class Card extends StatefulSnippet {
     case "view" => view
     case "adder" => adder
   }
-  def proc_card:Box[WordCard] = {
-    WordCard.find(OrderBy(WordCard.lastmod, Ascending)) match {
-      case Full(card) => {
-        if(card.skip.is==0) {
-          Full(card)
-        } else {
-          card.skip(card.skip.is-1)
-          card.lastmod(new java.util.Date())
-          card.save()
-          proc_card
-        }
-      }
-      case x => x
-    }
-  }
   var backvisible:Boolean = false
   def view:(NodeSeq=>NodeSeq) = {
-    proc_card match {
+    User.fetchCurrentTop() match {
       case Full(card) => {
         "class=card-front *" #> card.front.is &
         "class=card-back *" #> (if(backvisible) card.back.is else "") &
@@ -53,21 +38,30 @@ class Card extends StatefulSnippet {
           card.rank(0)
           card.save()
           backvisible = false
+        }) else ClearNodes) &
+        "class=card-del" #> (if(backvisible) onSubmit({s =>
+          card.delete_!
+          backvisible = false
         }) else ClearNodes)
       }
       case x => { x:NodeSeq => <span>====</span> }
     }
   }
   def adder = {
-    val card = WordCard.create
-    "name=front" #> card.front.toForm &
-    "name=back" #> card.back.toForm &
-    "type=submit" #> onSubmit({s =>
-      card.rank(0)
-      card.skip(0)
-      card.lastmod(new java.util.Date())
-      card.save()
-    })
+    User.currentUser match {
+      case Full(user) => {
+        val card = WordCard.create.user(user)
+        "name=front" #> card.front.toForm &
+        "name=back" #> card.back.toForm &
+        "type=submit" #> onSubmit({s =>
+          card.rank(0)
+          card.skip(0)
+          card.lastmod(new java.util.Date())
+          card.save()
+        })
+      }
+      case _ => { x:NodeSeq => <span>please login first</span> }
+    }
   }
 }
 

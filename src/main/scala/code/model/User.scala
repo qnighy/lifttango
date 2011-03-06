@@ -1,13 +1,9 @@
-package code {
-package model {
+package code.model
 
 import _root_.net.liftweb.mapper._
 import _root_.net.liftweb.util._
 import _root_.net.liftweb.common._
 
-/**
- * The singleton that has methods for accessing the database
- */
 object User extends User with MetaMegaProtoUser[User] {
   override def dbTableName = "users" // define the DB table name
   override def screenWrap = Full(<lift:surround with="default" at="content">
@@ -18,6 +14,13 @@ object User extends User with MetaMegaProtoUser[User] {
 
   // comment this line out to require email validations
   override def skipEmailValidation = true
+
+  def fetchCurrentTop():Box[WordCard] = {
+    currentUser match {
+      case Full(user) => user.fetchTop()
+      case _ => Empty
+    }
+  }
 }
 
 /**
@@ -32,7 +35,20 @@ class User extends MegaProtoUser[User] {
     override def textareaCols = 50
     override def displayName = "Personal Essay"
   }
-}
 
-}
+  def fetchTop():Box[WordCard] = {
+    WordCard.find(By(WordCard.user, this), OrderBy(WordCard.lastmod, Ascending)) match {
+      case Full(card) => {
+        if(card.skip.is==0) {
+          Full(card)
+        } else {
+          card.skip(card.skip.is-1)
+          card.lastmod(new java.util.Date())
+          card.save()
+          fetchTop()
+        }
+      }
+      case x => x
+    }
+  }
 }
