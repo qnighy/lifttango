@@ -38,15 +38,18 @@ class Boot {
 
     // where to search snippet
     LiftRules.addToPackages("code")
+    LiftRules.encodeJSessionIdInUrl_? = true
 
     // Build SiteMap
     def sitemap = SiteMap(
-      Menu.i("Home") / "index" >> User.AddUserMenusAfter, // the simple way to declare a menu
+      Menu.i("Home") / "index",
+      Menu.i("Mobile") / "mobile"
+      >> User.AddUserMenusAfter
 
       // more complex because this menu allows anything in the
       // /static path to be visible
-      Menu(Loc("Static", Link(List("static"), true, "/static/index"), 
-	       "Static Content")))
+      // Menu(Loc("Static", Link(List("static"), true, "/static/index"), "Static Content"))
+      )
 
     def sitemapMutators = User.sitemapMutator
 
