@@ -14,13 +14,6 @@ object User extends User with MetaMegaProtoUser[User] {
 
   // comment this line out to require email validations
   override def skipEmailValidation = true
-
-  def fetchCurrentTop():Box[WordCard] = {
-    currentUser match {
-      case Full(user) => user.fetchTop()
-      case _ => Empty
-    }
-  }
 }
 
 /**
@@ -36,19 +29,11 @@ class User extends MegaProtoUser[User] {
     override def displayName = "Personal Essay"
   }
 
-  def fetchTop():Box[WordCard] = {
-    WordCard.find(By(WordCard.user, this), OrderBy(WordCard.lastmod, Ascending)) match {
-      case Full(card) => {
-        if(card.skip.is==0) {
-          Full(card)
-        } else {
-          card.skip(card.skip.is-1)
-          card.lastmod(new java.util.Date())
-          card.save()
-          fetchTop()
-        }
-      }
-      case x => x
+  object currentRand extends MappedLong(this) {
+    override def defaultValue = scala.util.Random.nextLong()
+    def reload:Unit = {
+      this(scala.util.Random.nextLong())
+      save()
     }
   }
 }

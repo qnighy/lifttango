@@ -1,0 +1,14 @@
+<div id="main" class="lift:surround?with=default;at=content">
+  <h2>Welcome LiftTango!</h2>
+  <h3>Add Card</h3>
+  <lift:test_cond.loggedin>
+    <div class="lift:AddCard?form=post">
+      Front:<textarea name="front"> </textarea> <br/>
+      Back:<textarea name="back"> </textarea> <br/>
+      <input type="submit" value="Add Card" />
+    </div>
+  </lift:test_cond.loggedin>
+  <lift:test_cond.loggedout>
+    Please <a href="/user_mgt/login">login</a> first.
+  </lift:test_cond.loggedout>
+</div>

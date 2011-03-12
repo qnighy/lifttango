@@ -1,0 +1,18 @@
+<div id="main" class="lift:surround?with=default;at=content">
+  <h2>Welcome LiftTango!</h2>
+  <h3>Edit Card</h3>
+  <lift:test_cond.loggedin>
+    <ul>
+      <li class="lift:EditCard">
+        rank: <span class="card-rank">(rank)</span> /
+        <input type="text" name="card-front" />
+        <input type="text" name="card-back" />
+        <input type="submit" name="card-save" />
+        <input type="submit" name="card-del" />
+      </li>
+    </ul>
+  </lift:test_cond.loggedin>
+  <lift:test_cond.loggedout>
+    Please <a href="/user_mgt/login">login</a> first.
+  </lift:test_cond.loggedout>
+</div>
