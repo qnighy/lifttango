@@ -20,11 +20,11 @@ class EditCard {
     )
 
   def renderCard(card:WordCard) =
-    ".card-rank" #> card.rank.obj.get.rank_num &
+    ".card-rank" #> card.rank.is &
     "name=card-front" #> text(card.front.is, card.front(_)) &
     "name=card-back" #> text(card.back.is, card.back(_)) &
-    "name=card-save" #> submit("Save Card", () => card.initRank().save) &
-    "name=card-del" #> submit("Delete", () => card.changeRank(Empty).delete_!)
+    "name=card-save" #> submit("Save Card", () => card.initRank()) &
+    "name=card-del" #> submit("Delete", () => card.delete_!)
 }
 
 

@@ -17,11 +17,12 @@ class AddCard extends StatefulSnippet {
   }
   def render = {
     val user = User.currentUser.get
-    val card = WordCard.create.user(user)
-    "name=front" #> card.front.toForm &
-    "name=back" #> card.back.toForm &
+    var front_str:String = ""
+    var back_str:String = ""
+    "name=front" #> text(front_str, front_str = _) &
+    "name=back" #> text(back_str, back_str = _) &
     "type=submit" #> onSubmit({s =>
-      card.initRank()
+      WordCard.addNewCard(user, front_str, back_str)
     })
   }
 }

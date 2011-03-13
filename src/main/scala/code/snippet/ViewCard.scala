@@ -27,10 +27,12 @@ class ViewCard extends StatefulSnippet {
         })) &
         ".card-accept" #> (if(backvisible) onSubmit({s =>
           card.incrRank()
+          AnswerLog.create.user(User.currentUser).card(card).result(true).save()
           backvisible = false
         }) else ClearNodes) &
         ".card-deny" #> (if(backvisible) onSubmit({s =>
           card.initRank()
+          AnswerLog.create.user(User.currentUser).card(card).result(false).save()
           backvisible = false
         }) else ClearNodes)
       }

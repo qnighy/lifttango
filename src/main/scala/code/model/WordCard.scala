@@ -6,49 +6,48 @@ import _root_.net.liftweb.common._
 
 object WordCard extends WordCard with LongKeyedMetaMapper[WordCard] {
   def selectCard(u:User):Box[WordCard] = {
-    var sum:Long = 0
-    for(r <- RankInfo.ranksA(u)) {
-      sum = sum * 2 + r.rank_count.is
-    }
-    if(sum == 0) {
-      return Empty
-    }
-    var i = Math.abs(scala.util.Random.nextLong())%sum
-    for(r <- RankInfo.ranksD(u)) {
-      if(i < r.rank_count.is) {
-        return Full(findAll(By(rank, r))(i.toInt))
-      }
-      i = (i - r.rank_count.is) / 2
+    val c = count(u)
+    if(c==0) return Empty
+    var r = 0
+    while(true) {
+      val i = Math.abs(scala.util.Random.nextLong())%c
+      val wc = find(By(user,u),By(internalId,i)).get
+      if(wc.rank.is <= r) return Full(wc)
+      r = r + 1
     }
     return Empty
   }
+  def addNewCard(u:User, f:String, b:String):WordCard = {
+    create.user(u).rank(0).front(f).back(b).internalId(count(u)).saveMe()
+  }
+  def count(u:User):Long = {
+    find(By(user,u),OrderBy(internalId,Descending)).dmap[Long](-1)(_.internalId.is)+1
+  }
+  override def beforeDelete = {wc:WordCard => wc.deleteInternalId} :: super.beforeDelete
 }
 
 class WordCard extends LongKeyedMapper[WordCard] with IdPK {
   def getSingleton = WordCard
 
   object user extends LongMappedMapper(this, User)
-  object rank extends LongMappedMapper(this, RankInfo)
+  object rank extends MappedLong(this)
+  object internalId extends MappedLong(this)
   object front extends MappedText(this)
   object back extends MappedText(this)
 
-  def changeRank(torank:Box[RankInfo]) = {
-    rank.obj match {
-      case Full(r) => r.decrCount()
-      case _ =>
-    }
-    torank match {
-      case Full(r) => r.incrCount()
-      case _ =>
-    }
-    rank(torank)
+  def incrRank():WordCard = {
+    val r = rank.is
+    rank(rank.is+1)
     saveMe()
   }
-
-  def incrRank() = {
-    changeRank(Full(rank.obj.get.succRank))
+  def initRank():WordCard = {
+    rank(0).saveMe()
   }
-  def initRank() = {
-    changeRank(Full(RankInfo.firstRank(user.obj.get)))
+
+  def deleteInternalId():Unit = {
+    WordCard.find(By(WordCard.user,user.is),OrderBy(WordCard.internalId,Descending)) match {
+      case Full(c) if c != this => c.internalId(internalId.is).save()
+      case _ =>
+    }
   }
 }
