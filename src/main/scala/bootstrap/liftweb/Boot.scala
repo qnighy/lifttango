@@ -44,7 +44,8 @@ class Boot {
     def sitemap = SiteMap(
       Menu.i("Home") / "index" >> User.AddUserMenusAfter,
       Menu.i("Mobile") / "mobile" >> If(() => User.loggedIn_?, S ? "login first"),
-      Menu.i("Edit Card") / "edit-card" >> If(() => User.loggedIn_?, S ? "login first")
+      Menu.i("Edit Card") / "edit-card" >> If(() => User.loggedIn_?, S ? "login first"),
+      Menu.i("Import/Export Card") / "port-card" >> If(() => User.loggedIn_?, S ? "login first")
 
       // more complex because this menu allows anything in the
       // /static path to be visible

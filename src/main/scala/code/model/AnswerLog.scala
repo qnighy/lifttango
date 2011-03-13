@@ -13,7 +13,12 @@ class AnswerLog extends LongKeyedMapper[AnswerLog] with IdPK {
     override def defaultValue = new java.util.Date()
   }
   object user extends LongMappedMapper(this, User)
-  object card extends LongMappedMapper(this, WordCard)
+  object front extends MappedText(this)
+  object back extends MappedText(this)
   object result extends MappedBoolean(this)
+
+  def setCard(c:WordCard):AnswerLog = {
+    user(c.user.obj).front(c.front.is).back(c.back.is)
+  }
 }
 

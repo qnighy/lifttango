@@ -15,8 +15,12 @@ class ViewCard extends StatefulSnippet {
   override def dispatch = {
     case "render" => render
   }
-  val selectedCard:Box[WordCard] = WordCard.selectCard(User.currentUser.get)
+  var selectedCard:Box[WordCard] = WordCard.selectCard(User.currentUser.get)
   var backvisible:Boolean = false
+  def reload():Unit = {
+    backvisible = false
+    selectedCard = WordCard.selectCard(User.currentUser.get)
+  }
   def render:(NodeSeq=>NodeSeq) = {
     selectedCard match {
       case Full(card) => {
@@ -27,13 +31,13 @@ class ViewCard extends StatefulSnippet {
         })) &
         ".card-accept" #> (if(backvisible) onSubmit({s =>
           card.incrRank()
-          AnswerLog.create.user(User.currentUser).card(card).result(true).save()
-          backvisible = false
+          AnswerLog.create.setCard(card).result(true).save()
+          reload()
         }) else ClearNodes) &
         ".card-deny" #> (if(backvisible) onSubmit({s =>
           card.initRank()
-          AnswerLog.create.user(User.currentUser).card(card).result(false).save()
-          backvisible = false
+          AnswerLog.create.setCard(card).result(false).save()
+          reload()
         }) else ClearNodes)
       }
       case x => { x:NodeSeq => <span>No card there</span> }
