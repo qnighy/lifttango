@@ -1,12 +1,17 @@
 <!doctype html>
 <html><head><meta charset="utf-8"/><title>LiftTango</title></head>
 <body>
-  <div class="lift:Card?form=post">
-    <p class="card-front"> </p>
-    <p class="card-back"> </p>
-    <input type="submit" class="card-open" value="Open Back Side" />
-    <input type="submit" class="card-accept" value="O" />
-    <input type="submit" class="card-deny" value="X" />
+  <div class="lift:test_cond.loggedin">
+    <div class="lift:ViewCard?form=post">
+      <p class="card-front"> </p>
+      <p class="card-back"> </p>
+      <input type="submit" class="card-open" value="Open" />
+      <input type="submit" class="card-accept" value="O" />
+      <input type="submit" class="card-deny" value="X" />
+    </div>
+  </div>
+  <div class="lift:test_cond.loggedout">
+    Please <a href="/user_mgt/login">login</a> first.
   </div>
   <p><a href="/">Home</a></p>
 </body></html>
